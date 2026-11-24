@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YardContract — Service Agreement Builder</title>
+<style>
+  :root{
+    --ink:#1e2b1a; --muted:#5c6b57; --brand:#3e7d32; --brand-dark:#2c5c23;
+    --bg:#f6f8f3; --card:#ffffff; --line:#dce4d5; --accent:#e9f3e2;
+    --warn-bg:#fdf0e6; --warn-ink:#8a4b12; --warn-line:#f0c491;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg); color:var(--ink); line-height:1.5;}
+  .wrap{max-width:1020px; margin:0 auto; padding:0 20px 48px;}
+  header{background:var(--ink); color:#fff; margin-bottom:28px;}
+  header .inner{max-width:1020px; margin:0 auto; padding:16px 20px; display:flex;
+                align-items:center; justify-content:space-between;}
+  .logo{font-size:22px; font-weight:800;}
+  .logo span{color:#8fd07a;}
+  header a{color:#fff; text-decoration:none; font-weight:600; font-size:15px;}
+  header a:hover{text-decoration:underline;}
+  h1{font-size:26px; margin-bottom:4px;}
+  .sub{color:var(--muted); margin-bottom:22px;}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start;}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .card h2{font-size:18px; margin-bottom:16px;}
+  .card h2 .pro-tag{display:inline-block; background:var(--ink); color:#fff; font-size:11px;
+                    font-weight:800; letter-spacing:.4px; padding:2px 8px; border-radius:20px;
+                    vertical-align:middle; margin-left:8px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:14px; font-weight:600; margin-bottom:5px;}
+  .field .hint{font-weight:400; color:var(--muted); font-size:12.5px;}
+  .field input[type=text], .field input[type=number], .field input[type=email], .field input[type=tel],
+  .field input[type=date], .field select{
+    width:100%; padding:10px 12px; font-size:16px; border:1px solid var(--line);
+    border-radius:7px; background:#fff; color:var(--ink);}
+  .field input:focus, .field select:focus{outline:2px solid var(--brand); outline-offset:0; border-color:var(--brand);}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .check{display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:15px; cursor:pointer;}
+  .check input{width:18px; height:18px; margin-top:2px; accent-color:var(--brand); flex:none;}
+  .sur-row{display:grid; grid-template-columns:1fr 110px; gap:12px; align-items:end; margin-bottom:6px;}
+  .sur-row .field{margin-bottom:8px;}
+  .addon-row{display:grid; grid-template-columns:1fr 84px 70px 84px; gap:10px; align-items:end;
+             padding:9px 0; border-bottom:1px solid var(--line);}
+  .addon-row:last-of-type{border-bottom:none;}
+  .addon-row .aname{font-size:15px; font-weight:600; padding-bottom:10px;}
+  .addon-row .aname .unit{display:block; font-weight:400; color:var(--muted); font-size:12.5px;}
+  .addon-row label{display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px;}
+  .addon-row input{width:100%; padding:8px 10px; font-size:15px; border:1px solid var(--line);
+                   border-radius:7px; background:#fff; color:var(--ink);}
+  .addon-row .line-total{font-weight:700; font-size:14.5px; padding-bottom:10px; text-align:right;
+                         font-variant-numeric:tabular-nums;}
+  .result-row{display:flex; justify-content:space-between; align-items:baseline;
+              padding:9px 0; border-bottom:1px solid var(--line); font-size:15.5px;}
+  .result-row:last-of-type{border-bottom:none;}
+  .result-row .lbl{color:var(--muted);}
+  .result-row .val{font-weight:700; font-variant-numeric:tabular-nums;}
+  .result-row.big{padding:14px 0;}
+  .result-row.big .lbl{color:var(--ink); font-weight:700; font-size:17px;}
+  .result-row.big .val{font-size:26px; color:var(--brand-dark);}
+  .result-row.profit .val{color:var(--brand-dark);}
+  .group-label{font-size:12.5px; font-weight:800; letter-spacing:.5px; color:var(--muted);
+               text-transform:uppercase; margin:16px 0 2px;}
+  .group-label:first-of-type{margin-top:0;}
+  .warning{display:none; background:var(--warn-bg); border:1px solid var(--warn-line);
+           color:var(--warn-ink); border-radius:8px; padding:12px 14px; font-size:14.5px; margin-top:14px;}
+  .btn{display:inline-block; padding:12px 22px; border-radius:8px; font-size:16px; font-weight:700;
+       border:2px solid transparent; cursor:pointer; text-decoration:none; text-align:center;}
+  .btn-primary{background:var(--brand); color:#fff; width:100%;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-ghost{background:#fff; color:var(--brand-dark); border-color:var(--brand);}
+  .btn-ghost:hover{background:var(--accent);}
+  .btn-small{padding:6px 12px; font-size:13.5px; border-radius:6px;}
+  .btn[disabled]{opacity:.45; cursor:not-allowed;}
+  .save-row{display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;}
+  .save-row input{flex:1; min-width:160px; padding:10px 12px; font-size:15px; border:1px solid var(--line); border-radius:7px;}
+  .saved-list{margin-top:14px;}
+  .saved-item{display:flex; align-items:center; gap:8px; padding:9px 0; border-bottom:1px solid var(--line); flex-wrap:wrap;}
+  .saved-item:last-child{border-bottom:none;}
+  .saved-item .name{flex:1; min-width:120px; font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .saved-item .amt{font-weight:700; font-size:14.5px; font-variant-numeric:tabular-nums;}
+  .saved-item .date{color:var(--muted); font-size:12.5px;}
+  .saved-item select{padding:6px 8px; font-size:13.5px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--ink);}
+  .status{font-size:11.5px; font-weight:800; letter-spacing:.3px; padding:2px 8px; border-radius:20px;}
+  .st-Draft{background:#eef2f6; color:var(--muted);}
+  .st-Sent{background:#e3ecfd; color:#274b9f;}
+  .st-Active{background:var(--accent); color:var(--brand-dark);}
+  .st-Paused{background:var(--warn-bg); color:var(--warn-ink);}
+  .st-Ended{background:#fdecec; color:#9f2727;}
+  .empty-note{color:var(--muted); font-size:14.5px;}
+  .stack{display:grid; gap:20px;}
+  .fineprint{color:var(--muted); font-size:13px; margin-top:12px;}
+  .data-note{background:var(--warn-bg); border:1px solid var(--warn-line); color:var(--warn-ink);
+             border-radius:8px; padding:12px 14px; font-size:14.5px;}
+  .data-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;}
+  /* Watermarked preview */
+  .preview-doc{position:relative; overflow:hidden; background:#fff; border:1px solid var(--line);
+               border-radius:6px; padding:28px 30px; margin-top:6px;}
+  .preview-doc .wm{position:absolute; inset:-40%; display:flex; flex-wrap:wrap; align-content:center;
+                   justify-content:center; gap:34px 44px; transform:rotate(-28deg);
+                   pointer-events:none; z-index:2;}
+  .preview-doc .wm span{font-size:25px; font-weight:800; letter-spacing:1px; color:var(--ink); opacity:.07; white-space:nowrap;}
+  .preview-doc .inner{position:relative; z-index:1;}
+  .preview-doc .co{font-size:19px; font-weight:800;}
+  .preview-doc .contact{color:var(--muted); font-size:12.5px;}
+  .preview-doc .rule{height:3px; background:var(--brand); border-radius:2px; margin:8px 0 14px;}
+  .preview-doc h3{font-size:15.5px; margin-bottom:2px;}
+  .preview-doc .pdate{color:var(--muted); font-size:12.5px; margin-bottom:12px;}
+  .preview-doc h4{font-size:13.5px; margin:13px 0 5px;}
+  .preview-doc p, .preview-doc li{font-size:13.5px;}
+  .preview-doc ul{margin:0 0 4px 18px;}
+  .preview-doc .kv{display:flex; gap:8px; font-size:13.5px; padding:2px 0;}
+  .preview-doc .kv b{min-width:132px;}
+  .preview-doc .invest b{color:var(--brand-dark); font-size:16.5px;}
+  @media (max-width:820px){ .grid{grid-template-columns:1fr;} .row2{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="logo">Yard<span>Contract</span></div>
+    <a href="index.html">← Back to home</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>Service agreement builder</h1>
+  <p class="sub">Type the property and the season dates. Your numbers update as you type — per-visit price, calendar visit count, billing plan, season total, and your private contract profit. The builder and the watermarked preview below are free, and your first clean PDF is free too.</p>
+
+  <div class="grid">
+    <!-- LEFT: inputs -->
+    <div class="stack">
+      <div class="card">
+        <h2>Your company</h2>
+        <div class="field">
+          <label for="companyName">Company name <span class="hint">— printed on the agreement</span></label>
+          <input type="text" id="companyName" placeholder="e.g. GreenEdge Lawn Care" autocomplete="off">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="companyPhone">Phone <span class="hint">— optional</span></label>
+            <input type="tel" id="companyPhone" placeholder="e.g. (916) 555-0142" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="companyEmail">Email <span class="hint">— optional</span></label>
+            <input type="email" id="companyEmail" placeholder="e.g. hello@yourcompany.com" autocomplete="off">
+          </div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="logoInput">Company logo <span class="hint">— PNG or JPG, shown on the Pro PDF</span></label>
+          <input type="file" id="logoInput" accept="image/png,image/jpeg">
+          <p class="fineprint" id="logoStatus">No logo uploaded.</p>
+          <button class="btn btn-ghost btn-small" id="removeLogoBtn" type="button" style="display:none;">Remove logo</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Client &amp; property</h2>
+        <div class="field">
+          <label for="clientName">Client name <span class="hint">— who the agreement is prepared for</span></label>
+          <input type="text" id="clientName" placeholder="e.g. Marcus &amp; Elena Ruiz" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="serviceAddress">Service address</label>
+          <input type="text" id="serviceAddress" placeholder="e.g. 4218 Willow Creek Dr" autocomplete="off">
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="lotSqft">Lot size (sq ft)</label>
+            <input type="number" id="lotSqft" min="0" step="any" value="8500">
+          </div>
+          <div class="field">
+            <label for="lotTier">Size tier <span class="hint">— sets the base mowing price</span></label>
+            <select id="lotTier">
+              <option value="small">Small — under 5,000 sq ft</option>
+              <option value="medium" selected>Medium — 5,000–10,000 sq ft</option>
+              <option value="large">Large — 10,000–20,000 sq ft</option>
+              <option value="xl">XL — 20,000+ sq ft</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="basePrice">Base mowing price per visit ($) <span class="hint">— mow, trim, edge &amp; blow</span></label>
+          <input type="number" id="basePrice" min="0" step="any" value="60">
+        </div>
+        <p class="hint" style="color:var(--muted); font-size:13px; margin-bottom:10px;">Yard surcharges — flat adders per visit for yards that take longer:</p>
+        <div class="sur-row">
+          <label class="check"><input type="checkbox" id="sur_gate"> Wide gate / large-equipment access needed</label>
+          <div class="field"><label for="sur_gate_amt">Add ($)</label><input type="number" id="sur_gate_amt" min="0" step="any" value="10"></div>
+        </div>
+        <div class="sur-row">
+          <label class="check"><input type="checkbox" id="sur_slope" checked> Sloped terrain</label>
+          <div class="field"><label for="sur_slope_amt">Add ($)</label><input type="number" id="sur_slope_amt" min="0" step="any" value="10"></div>
+        </div>
+        <div class="sur-row">
+          <label class="check"><input type="checkbox" id="sur_obstacles"> Heavy obstacles <span style="color:var(--muted); font-size:12.5px;">(trees, playsets, beds)</span></label>
+          <div class="field"><label for="sur_obstacles_amt">Add ($)</label><input type="number" id="sur_obstacles_amt" min="0" step="any" value="8"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Season, frequency &amp; billing</h2>
+        <div class="field">
+          <label for="frequency">Core visit frequency <span class="hint">— how often you service the lawn</span></label>
+          <select id="frequency">
+            <option value="weekly">Weekly</option>
+            <option value="biweekly" selected>Every 2 weeks (biweekly)</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="seasonStartDate">Season starts</label>
+            <input type="date" id="seasonStartDate" value="2026-04-01">
+          </div>
+          <div class="field">
+            <label for="seasonEndDate">Season ends</label>
+            <input type="date" id="seasonEndDate" value="2026-10-31">
+          </div>
+        </div>
+        <div class="field">
+          <label for="billingMode">How the client pays <span class="hint">— separate from how often you visit</span></label>
+          <select id="billingMode">
+            <option value="pervisit" selected>Per visit — client pays for each completed visit</option>
+            <option value="seasonal">Seasonal flat rate — equal monthly payments during the season</option>
+            <option value="annual">Annual flat rate — equal monthly payments all year (12)</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="visitsOverride">Visits per season override <span class="hint">— optional</span></label>
+          <input type="number" id="visitsOverride" min="0" step="1" placeholder="Blank = counted from your season dates">
+          <p class="fineprint" id="visitsAutoNote" style="margin-top:6px;">Visits are counted on the real calendar between your season dates — weekly every 7 days, biweekly every 14, monthly on the same day each month.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Seasonal services <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— set a count of 0 to leave a service out. "Your cost" is private, per application — it feeds your contract profit only.</span></h2>
+        <div class="addon-row">
+          <div class="aname">Fertilization<span class="unit">per application</span></div>
+          <div><label for="price_fert">Price ($)</label><input type="number" id="price_fert" min="0" step="any" value="55"></div>
+          <div><label for="count_fert">Count</label><input type="number" id="count_fert" min="0" step="any" value="3"></div>
+          <div><label for="cost_fert">Your cost ($)</label><input type="number" id="cost_fert" min="0" step="any" value="0"></div>
+        </div>
+        <div class="addon-row">
+          <div class="aname">Core aeration<span class="unit">per application</span></div>
+          <div><label for="price_aeration">Price ($)</label><input type="number" id="price_aeration" min="0" step="any" value="95"></div>
+          <div><label for="count_aeration">Count</label><input type="number" id="count_aeration" min="0" step="any" value="0"></div>
+          <div><label for="cost_aeration">Your cost ($)</label><input type="number" id="cost_aeration" min="0" step="any" value="0"></div>
+        </div>
+        <div class="addon-row">
+          <div class="aname">Overseeding<span class="unit">per application</span></div>
+          <div><label for="price_overseed">Price ($)</label><input type="number" id="price_overseed" min="0" step="any" value="120"></div>
+          <div><label for="count_overseed">Count</label><input type="number" id="count_overseed" min="0" step="any" value="0"></div>
+          <div><label for="cost_overseed">Your cost ($)</label><input type="number" id="cost_overseed" min="0" step="any" value="0"></div>
+        </div>
+        <div class="addon-row">
+          <div class="aname">Leaf cleanup<span class="unit">per visit</span></div>
+          <div><label for="price_leaf">Price ($)</label><input type="number" id="price_leaf" min="0" step="any" value="75"></div>
+          <div><label for="count_leaf">Count</label><input type="number" id="count_leaf" min="0" step="any" value="0"></div>
+          <div><label for="cost_leaf">Your cost ($)</label><input type="number" id="cost_leaf" min="0" step="any" value="0"></div>
+        </div>
+        <div class="addon-row">
+          <div class="aname">Hedge &amp; shrub trimming<span class="unit">per visit</span></div>
+          <div><label for="price_hedge">Price ($)</label><input type="number" id="price_hedge" min="0" step="any" value="65"></div>
+          <div><label for="count_hedge">Count</label><input type="number" id="count_hedge" min="0" step="any" value="0"></div>
+          <div><label for="cost_hedge">Your cost ($)</label><input type="number" id="cost_hedge" min="0" step="any" value="0"></div>
+        </div>
+        <div class="addon-row">
+          <div class="aname">Mulch installation<span class="unit">per yard</span></div>
+          <div><label for="price_mulch">Price ($)</label><input type="number" id="price_mulch" min="0" step="any" value="95"></div>
+          <div><label for="count_mulch">Yards</label><input type="number" id="count_mulch" min="0" step="any" value="0"></div>
+          <div><label for="cost_mulch">Your cost ($)</label><input type="number" id="cost_mulch" min="0" step="any" value="0"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Your crew costs <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— private, never shown to the client</span></h2>
+        <div class="row2">
+          <div class="field">
+            <label for="crewRate">Crew cost ($/hour) <span class="hint">— total for the crew on site</span></label>
+            <input type="number" id="crewRate" min="0" step="any" value="38">
+          </div>
+          <div class="field">
+            <label for="hoursPerVisit">Hours per visit</label>
+            <input type="number" id="hoursPerVisit" min="0" step="any" value="0.75">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="fuelPerVisit">Fuel per visit ($)</label>
+            <input type="number" id="fuelPerVisit" min="0" step="any" value="0">
+          </div>
+          <div class="field">
+            <label for="equipmentPerVisit">Equipment per visit ($) <span class="hint">— wear &amp; upkeep</span></label>
+            <input type="number" id="equipmentPerVisit" min="0" step="any" value="0">
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="overheadPerVisit">Overhead per visit ($) <span class="hint">— insurance, software, truck</span></label>
+            <input type="number" id="overheadPerVisit" min="0" step="any" value="0">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label for="expensesPerVisit">Other cost per visit ($) <span class="hint">— disposal, supplies</span></label>
+            <input type="number" id="expensesPerVisit" min="0" step="any" value="6">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Agreement terms</h2>
+        <div class="field">
+          <label for="scopeIncluded">Scope included <span class="hint">— printed on the agreement</span></label>
+          <input type="text" id="scopeIncluded" value="Mowing, trimming, edging, and blowing of all turf areas on each scheduled visit. Clippings are mulched or hauled away the same day." autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="scopeExcluded">Scope excluded <span class="hint">— optional, what's NOT included</span></label>
+          <input type="text" id="scopeExcluded" placeholder="e.g. Irrigation repair, tree work, and storm debris removal" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="weatherTerms">Weather delays</label>
+          <input type="text" id="weatherTerms" value="If weather prevents a scheduled visit, service moves to the next available day that week. No charge is made for a visit that cannot be completed." autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="payTerms">Payment terms</label>
+          <input type="text" id="payTerms" value="Invoices are sent monthly and are due within 15 days of the invoice date." autocomplete="off">
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="cancelDays">Cancellation notice (days) <span class="hint">— either party, in writing</span></label>
+          <input type="number" id="cancelDays" min="0" step="1" value="14">
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: results + preview + pro -->
+    <div class="stack">
+      <div class="card">
+        <h2>Agreement numbers</h2>
+        <div class="group-label">What the client sees</div>
+        <div class="result-row"><span class="lbl">Per-visit price (mowing + surcharges)</span><span class="val" id="rPerVisit">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Visits per season</span><span class="val" id="rVisits">0</span></div>
+        <div class="result-row"><span class="lbl">Season length</span><span class="val" id="rSeasonMonths">0 months</span></div>
+        <div class="result-row"><span class="lbl">Core season total (visits only)</span><span class="val" id="rCoreSeason">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Seasonal services total</span><span class="val" id="rAddonsTotal">$0.00</span></div>
+        <div class="result-row big"><span class="lbl">Season total</span><span class="val" id="rSeasonTotal">$0.00</span></div>
+        <div class="result-row"><span class="lbl">How the client pays</span><span class="val" id="rBilling">—</span></div>
+
+        <div class="group-label">Your numbers — private, never shown to the client</div>
+        <div class="result-row"><span class="lbl">Your cost per visit</span><span class="val" id="rCostPerVisit">$0.00</span></div>
+        <div class="result-row profit"><span class="lbl">Profit per visit at this price</span><span class="val" id="rProfitPerVisit">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Profit margin per visit (share of the price)</span><span class="val" id="rMargin">—</span></div>
+        <div class="result-row"><span class="lbl">Seasonal services cost (whole season)</span><span class="val" id="rAddonsCost">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Total contract revenue</span><span class="val" id="rContractRevenue">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Total contract cost</span><span class="val" id="rContractCost">$0.00</span></div>
+        <div class="result-row profit"><span class="lbl">Total contract profit</span><span class="val" id="rContractProfit">$0.00</span></div>
+        <div class="result-row"><span class="lbl">Contract margin (share of the price)</span><span class="val" id="rContractMargin">—</span></div>
+
+        <div class="warning" id="marginWarning">
+          <strong>Careful:</strong> a profit margin under 10% is very thin. One breakdown, one pricey
+          repair, or one slow-paying client can turn this agreement into a loss. Most healthy lawn
+          routes run 25–45% on recurring mowing.
+        </div>
+
+        <div style="margin-top:20px;">
+          <button class="btn btn-primary" id="pdfBtn" type="button">Download clean PDF agreement</button>
+          <p class="fineprint" id="pdfNote">Your first clean PDF agreement is free — no watermark, your logo, ready to sign. After that, PDFs are a Pro feature.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Agreement preview <span class="hint" style="font-weight:400; color:var(--muted); font-size:13px;">— free, watermarked</span></h2>
+        <div class="preview-doc" id="previewDoc">
+          <div class="wm" aria-hidden="true">
+            <span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span>
+            <span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span>
+            <span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span>
+            <span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span><span>PREVIEW — YardContract</span>
+          </div>
+          <div class="inner">
+            <div class="co" id="pvCompany">Your Lawn Care Company</div>
+            <div class="contact" id="pvContact"></div>
+            <div class="rule"></div>
+            <h3>Lawn Care Service Agreement</h3>
+            <div class="pdate">Prepared for: <strong id="pvClient">Your Client</strong> · <span id="pvDate"></span></div>
+            <h4>Property &amp; schedule</h4>
+            <div class="kv"><b>Service address</b><span id="pvAddress">—</span></div>
+            <div class="kv"><b>Lot size</b><span id="pvLot">—</span></div>
+            <div class="kv"><b>Frequency</b><span id="pvFreq">—</span></div>
+            <div class="kv"><b>Season</b><span id="pvSeason">—</span></div>
+            <h4>Services &amp; pricing</h4>
+            <ul id="pvServices"></ul>
+            <p class="invest">Season total: <b id="pvSeasonTotal">—</b></p>
+            <div class="kv"><b>Per-visit price</b><span id="pvPerVisit">—</span></div>
+            <div class="kv"><b>Billing</b><span id="pvBilling">—</span></div>
+            <h4>Terms</h4>
+            <p id="pvTerms">—</p>
+          </div>
+        </div>
+        <p class="fineprint">This is what your client sees — services, schedule, and prices only. Your crew costs and margin never appear here or on the PDF.</p>
+      </div>
+
+      <!-- PRO GATE (shown when Pro is locked) -->
+      <div class="card" id="proGate">
+        <h2>YardContract Pro <span class="pro-tag">PRO</span></h2>
+        <p style="font-size:15px; margin-bottom:6px;">Unlock unlimited clean PDF agreements, saved agreements, the client dashboard, the renewal center, and backup export.</p>
+        <p style="font-size:15px; margin-bottom:16px;"><strong>Founding-member pricing — locked in while your subscription stays active:</strong> $19/month, or $129/year ($10.75/month — save $99 vs paying monthly). Standard price later: $29/month or $199/year.</p>
+        <a class="btn btn-primary" id="subscribeBtn" href="https://buy.stripe.com/3cI7sM2RB9H26eU9K00oM0s" style="margin-bottom:12px;">Subscribe — $19/month</a>
+        <a class="btn btn-primary" id="subscribeAnnualBtn" href="https://buy.stripe.com/cNiaEY1Nx3iE9r67BS0oM0t" style="margin-bottom:12px;">Subscribe — $129/year founding annual</a>
+        <button class="btn btn-ghost" id="unlockBtn" type="button" style="width:100%;">I already subscribed — unlock Pro</button>
+        <p class="fineprint">Launch note: during our opening validation, unlocking is on the honor system — please subscribe first; the button simply turns Pro on for this browser on this device.</p>
+      </div>
+
+      <!-- PRO AREA (shown when Pro is unlocked) -->
+      <div id="proArea" style="display:none;">
+        <div class="stack">
+          <div class="card">
+            <h2>Client dashboard <span class="pro-tag">PRO</span></h2>
+            <div class="result-row"><span class="lbl">Active agreements</span><span class="val" id="totActive">0</span></div>
+            <div class="result-row"><span class="lbl">Monthly recurring (Active agreements)</span><span class="val" id="totMonthly">$0.00/mo</span></div>
+            <div class="result-row"><span class="lbl">Season revenue (Active)</span><span class="val" id="totSeasonRev">$0.00</span></div>
+            <p class="fineprint">Reminder: your records live only in this browser on this device and do not sync to your phone or another computer — export a backup below regularly; that backup file is your protection.</p>
+            <div class="save-row">
+              <input type="text" id="agreementName" placeholder="Name this agreement, e.g. Ruiz — biweekly" autocomplete="off">
+              <button class="btn btn-ghost" id="saveBtn" type="button">Save agreement</button>
+            </div>
+            <div class="saved-list" id="savedList"></div>
+          </div>
+
+          <div class="card">
+            <h2>Renewal center <span class="pro-tag">PRO</span></h2>
+            <p style="font-size:15px; margin-bottom:12px;">Bring last season's clients back in one click: renewing copies an agreement, moves its season dates one year forward, and adjusts every service price by your percentage. The original agreement is never changed — renewals start as fresh Drafts.</p>
+            <div class="field" style="margin-bottom:0;">
+              <label for="renewAdjustPct">Price adjustment for next season (%)</label>
+              <input type="number" id="renewAdjustPct" step="any" value="3">
+            </div>
+            <div class="saved-list" id="renewalList"></div>
+          </div>
+
+          <div class="card">
+            <h2>Your data <span class="pro-tag">PRO</span></h2>
+            <div class="data-note"><strong>Your data is stored only in this browser on this device</strong> — export a backup regularly. Clearing browser data erases saved agreements.</div>
+            <div class="data-row">
+              <button class="btn btn-ghost btn-small" id="exportBackupBtn" type="button">Export backup (JSON)</button>
+              <button class="btn btn-ghost btn-small" id="exportCsvBtn" type="button">Export agreements (CSV)</button>
+              <label class="btn btn-ghost btn-small" for="importInput" style="cursor:pointer;">Import backup…</label>
+              <input type="file" id="importInput" accept="application/json,.json" style="display:none;">
+            </div>
+            <div class="data-row">
+              <button class="btn btn-ghost btn-small" id="lockBtn" type="button">Lock Pro on this device</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var STRIPE_LINK = "https://buy.stripe.com/3cI7sM2RB9H26eU9K00oM0s";
+  var STRIPE_LINK_ANNUAL = "https://buy.stripe.com/cNiaEY1Nx3iE9r67BS0oM0t";
+
+  var TEXT_FIELDS = ["companyName","companyPhone","companyEmail","clientName","serviceAddress",
+                     "seasonStartDate","seasonEndDate",
+                     "scopeIncluded","scopeExcluded","weatherTerms","payTerms"];
+  var NUM_FIELDS = ["lotSqft","basePrice","sur_gate_amt","sur_slope_amt","sur_obstacles_amt",
+                    "visitsOverride",
+                    "crewRate","hoursPerVisit","expensesPerVisit",
+                    "fuelPerVisit","equipmentPerVisit","overheadPerVisit","cancelDays",
+                    "price_fert","count_fert","cost_fert","price_aeration","count_aeration","cost_aeration",
+                    "price_overseed","count_overseed","cost_overseed","price_leaf","count_leaf","cost_leaf",
+                    "price_hedge","count_hedge","cost_hedge","price_mulch","count_mulch","cost_mulch"];
+  var SELECT_FIELDS = ["lotTier","frequency","billingMode"];
+  var CHECKS = ["sur_gate","sur_slope","sur_obstacles"];
+  var STATUSES = ["Draft","Sent","Active","Paused","Ended"];
+  var AGREEMENTS_KEY = "yardcontract.agreements.v1";
+  var PRO_KEY = "yardcontract.pro.v1";
+  var SETTINGS_KEY = "yardcontract.settings.v1";
+  var FREEPDF_KEY = "yardcontract.freepdf.v1";
+
+  var TIERS = {
+    small:  {label:"Small — under 5,000 sq ft", price:45},
+    medium: {label:"Medium — 5,000–10,000 sq ft", price:60},
+    large:  {label:"Large — 10,000–20,000 sq ft", price:80},
+    xl:     {label:"XL — 20,000+ sq ft", price:110}
+  };
+  var ADDONS = [
+    {key:"fert",     label:"Fertilization",           unit:"per application"},
+    {key:"aeration", label:"Core aeration",           unit:"per application"},
+    {key:"overseed", label:"Overseeding",             unit:"per application"},
+    {key:"leaf",     label:"Leaf cleanup",            unit:"per visit"},
+    {key:"hedge",    label:"Hedge & shrub trimming",  unit:"per visit"},
+    {key:"mulch",    label:"Mulch installation",      unit:"per yard"}
+  ];
+  var MONTHS = ["January","February","March","April","May","June","July","August",
+                "September","October","November","December"];
+  var LEGAL_FOOTER = "Template only — not legal advice. You are responsible for compliance with local laws.";
+
+  function $(id){ return document.getElementById(id); }
+
+  function num(id){
+    var v = parseFloat($(id).value);
+    return (isNaN(v) || v < 0) ? 0 : v;
+  }
+
+  function usd(v){
+    return "$" + v.toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function money(v){ return isNaN(v) ? "—" : usd(v); }
+
+  function tierForSqft(sqft){
+    if(sqft < 5000){ return "small"; }
+    if(sqft < 10000){ return "medium"; }
+    if(sqft < 20000){ return "large"; }
+    return "xl";
+  }
+  // ---- Calendar helpers ----
+  // Dates are handled as {y, m, d} parts and UTC day serials, so visit
+  // counting never depends on the visitor's timezone or daylight saving.
+  function parseDateStr(s){
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ""));
+    if(!m){ return null; }
+    var p = {y: parseInt(m[1], 10), m: parseInt(m[2], 10), d: parseInt(m[3], 10)};
+    if(p.m < 1 || p.m > 12 || p.d < 1 || p.d > 31){ return null; }
+    return p;
+  }
+  function pad2(n){ return (n < 10 ? "0" : "") + n; }
+  function dateStr(p){ return p.y + "-" + pad2(p.m) + "-" + pad2(p.d); }
+  function lastDayOf(y, m){ return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+  function daySerial(p){ return Math.round(Date.UTC(p.y, p.m - 1, p.d) / 86400000); }
+  function addMonthsParts(p, k){
+    var total = p.y * 12 + (p.m - 1) + k;
+    var y = Math.floor(total / 12);
+    var m = (total % 12) + 1;
+    return {y: y, m: m, d: Math.min(p.d, lastDayOf(y, m))};
+  }
+  function shiftYearParts(p){
+    return {y: p.y + 1, m: p.m, d: Math.min(p.d, lastDayOf(p.y + 1, p.m))};
+  }
+  function prettyDate(p){
+    return MONTHS[p.m - 1] + " " + p.d + ", " + p.y;
+  }
+  // Season dates for an input set. New agreements carry seasonStartDate /
+  // seasonEndDate strings; agreements saved by the older month-picker
+  // version carry seasonStart / seasonEnd month numbers and are converted
+  // (start = 1st of the start month, end = last day of the end month,
+  // wrapping into the next year when the end month precedes the start).
+  function seasonDates(inp){
+    var a = parseDateStr(inp.seasonStartDate);
+    var b = parseDateStr(inp.seasonEndDate);
+    if(a && b){ return {start: a, end: b}; }
+    var sm = parseInt(inp.seasonStart, 10) || 4;
+    var em = parseInt(inp.seasonEnd, 10) || 10;
+    var y = new Date().getFullYear();
+    var ey = em < sm ? y + 1 : y;
+    return {start: {y: y, m: sm, d: 1}, end: {y: ey, m: em, d: lastDayOf(ey, em)}};
+  }
+  // Calendar months the season touches, inclusive (Apr 1 – Oct 31 = 7).
+  function monthsSpanned(a, b){
+    var n = (b.y - a.y) * 12 + (b.m - a.m) + 1;
+    return n > 0 ? n : 0;
+  }
+  // Visit counting convention: the first visit falls ON the season start
+  // date. Weekly = every 7 days, biweekly = every 14 days, monthly = the
+  // same day of each following month (clamped to that month's last day,
+  // e.g. Jan 31 -> Feb 28 -> Mar 31). A visit counts when it lands on or
+  // before the season end date.
+  function countVisits(freq, a, b){
+    if(!a || !b){ return 0; }
+    var start = daySerial(a), end = daySerial(b);
+    if(end < start){ return 0; }
+    if(freq === "weekly"){ return Math.floor((end - start) / 7) + 1; }
+    if(freq === "biweekly"){ return Math.floor((end - start) / 14) + 1; }
+    var n = 0, k = 0;
+    while(k <= 1200){
+      if(daySerial(addMonthsParts(a, k)) > end){ break; }
+      n++; k++;
+    }
+    return n;
+  }
+
+  // ---- Billing plans ----
+  // Service frequency (how often you visit) and billing mode (how the
+  // client pays) are separate choices. Flat-rate installments are rounded
+  // to cents and the FINAL installment absorbs the remainder, so the
+  // payments always sum EXACTLY to the season total.
+  function billingFor(mode, seasonTotal, months){
+    if(mode === "seasonal" || mode === "annual"){
+      var n = mode === "annual" ? 12 : months;
+      if(n <= 0){ return {mode: mode, payments: 0, amount: 0, finalAmount: 0}; }
+      var totalCents = Math.round(seasonTotal * 100);
+      var amtCents = Math.round(totalCents / n);
+      var finCents = totalCents - amtCents * (n - 1);
+      return {mode: mode, payments: n, amount: amtCents / 100, finalAmount: finCents / 100};
+    }
+    return {mode: "pervisit", payments: 0, amount: 0, finalAmount: 0};
+  }
+  function billingText(inp, r){
+    var b = r.billing;
+    if(b.mode === "seasonal"){
+      var t = b.payments + " monthly payments of " + usd(b.amount) + " during the season";
+      if(b.finalAmount !== b.amount){ t += " (final payment " + usd(b.finalAmount) + ")"; }
+      return t + " — " + usd(r.seasonTotal) + " total";
+    }
+    if(b.mode === "annual"){
+      var t2 = "12 monthly payments of " + usd(b.amount) + " year-round";
+      if(b.finalAmount !== b.amount){ t2 += " (final payment " + usd(b.finalAmount) + ")"; }
+      return t2 + " — " + usd(r.seasonTotal) + " total";
+    }
+    return usd(r.perVisit) + " per completed visit (" + r.visits + " visits this season)";
+  }
+
+  function freqLabel(freq){
+    if(freq === "weekly"){ return "Weekly"; }
+    if(freq === "biweekly"){ return "Every 2 weeks"; }
+    return "Monthly";
+  }
+
+  // ---- Core agreement math (also documented in README.md) ----
+  function calculate(inp){
+    var dates = seasonDates(inp);
+    var months = monthsSpanned(dates.start, dates.end);
+    var autoVisits = countVisits(inp.frequency, dates.start, dates.end);
+    var override = Math.floor(inp.visitsOverride || 0);
+    var visits = override > 0 ? override : autoVisits;
+    var surcharges = 0;
+    CHECKS.forEach(function(id){
+      if(inp[id]){ surcharges += inp["surcharge_" + id] || 0; }
+    });
+    var perVisit = inp.basePrice + surcharges;
+    var coreSeason = perVisit * visits;
+    var addons = [];
+    var addonsTotal = 0;
+    var addonsCostTotal = 0;
+    ADDONS.forEach(function(a){
+      var price = inp["price_" + a.key] || 0;
+      var count = inp["count_" + a.key] || 0;
+      var cost = inp["cost_" + a.key] || 0;
+      var line = price * count;
+      var lineCost = cost * count;
+      addonsTotal += line;
+      addonsCostTotal += lineCost;
+      addons.push({key:a.key, label:a.label, unit:a.unit, price:price, count:count,
+                   cost:cost, line:line, lineCost:lineCost});
+    });
+    var seasonTotal = coreSeason + addonsTotal;
+    var monthlyEquiv = months > 0 ? seasonTotal / months : 0;
+    var annual = seasonTotal; // one season per year
+    var costPerVisit = inp.crewRate * inp.hoursPerVisit + inp.expensesPerVisit +
+                       (inp.fuelPerVisit || 0) + (inp.equipmentPerVisit || 0) +
+                       (inp.overheadPerVisit || 0);
+    var profitPerVisit = perVisit - costPerVisit;
+    var marginPct = perVisit > 0 ? profitPerVisit / perVisit * 100 : NaN;
+    // Whole-contract profitability: every visit's cost plus every add-on's
+    // own cost, against the full season revenue.
+    var contractRevenue = seasonTotal;
+    var contractCost = visits * costPerVisit + addonsCostTotal;
+    var contractProfit = contractRevenue - contractCost;
+    var contractMarginPct = contractRevenue > 0 ? contractProfit / contractRevenue * 100 : NaN;
+    var billing = billingFor(inp.billingMode, seasonTotal, months);
+    return {
+      months: months, visits: visits, autoVisits: autoVisits,
+      visitsOverridden: override > 0,
+      seasonStart: dates.start, seasonEnd: dates.end,
+      surcharges: surcharges, perVisit: perVisit,
+      coreSeason: coreSeason, addons: addons, addonsTotal: addonsTotal,
+      addonsCostTotal: addonsCostTotal,
+      seasonTotal: seasonTotal, monthlyEquiv: monthlyEquiv,
+      annual: annual, costPerVisit: costPerVisit, profitPerVisit: profitPerVisit,
+      marginPct: marginPct,
+      contractRevenue: contractRevenue, contractCost: contractCost,
+      contractProfit: contractProfit, contractMarginPct: contractMarginPct,
+      billing: billing
+    };
+  }
+
+  function readInputs(){
+    var inp = {};
+    TEXT_FIELDS.forEach(function(id){ inp[id] = $(id).value.trim(); });
+    NUM_FIELDS.forEach(function(id){ inp[id] = num(id); });
+    SELECT_FIELDS.forEach(function(id){ inp[id] = $(id).value; });
+    CHECKS.forEach(function(id){ inp[id] = $(id).checked ? true : false; });
+    inp.surcharge_sur_gate = inp.sur_gate_amt;
+    inp.surcharge_sur_slope = inp.sur_slope_amt;
+    inp.surcharge_sur_obstacles = inp.sur_obstacles_amt;
+    return inp;
+  }
+
+  function applyInputs(inp){
+    if(inp && !inp.seasonStartDate && (inp.seasonStart || inp.seasonEnd)){
+      // Agreement saved by the older month-picker version: convert its
+      // season months into real dates so the form can show them.
+      var d = seasonDates(inp);
+      inp = Object.assign({}, inp, {
+        seasonStartDate: dateStr(d.start),
+        seasonEndDate: dateStr(d.end)
+      });
+    }
+    TEXT_FIELDS.forEach(function(id){
+      if(inp[id] !== undefined && inp[id] !== null){ $(id).value = inp[id]; }
+    });
+    NUM_FIELDS.forEach(function(id){
+      if(inp[id] !== undefined && inp[id] !== null){ $(id).value = inp[id]; }
+    });
+    SELECT_FIELDS.forEach(function(id){
+      if(inp[id] !== undefined && inp[id] !== null){ $(id).value = inp[id]; }
+    });
+    CHECKS.forEach(function(id){
+      if(inp[id] !== undefined && inp[id] !== null){ $(id).checked = !!inp[id]; }
+    });
+    lastTier = $( "lotTier").value;
+  }
+
+  function serviceLines(inp, r){
+    var lines = [];
+    var surchargeBits = [];
+    CHECKS.forEach(function(id){
+      if(inp[id]){ surchargeBits.push(usd(inp["surcharge_" + id]) + " surcharge"); }
+    });
+    var core = "Mowing, trimming, edging & blowing — " + usd(r.perVisit) + " per visit";
+    if(surchargeBits.length){ core += " (includes " + surchargeBits.join(" + ") + ")"; }
+    lines.push(core);
+    r.addons.forEach(function(a){
+      if(a.count > 0){
+        lines.push(a.label + " — " + usd(a.price) + " " + a.unit + " × " + a.count + " = " + usd(a.line));
+      }
+    });
+    return lines;
+  }
+
+  function seasonLabel(inp, r){
+    return prettyDate(r.seasonStart) + " – " + prettyDate(r.seasonEnd) +
+           " (" + r.months + (r.months === 1 ? " month" : " months") + ")";
+  }
+
+  function render(){
+    var inp = readInputs();
+    var r = calculate(inp);
+    $("rPerVisit").textContent      = money(r.perVisit);
+    $("rVisits").textContent        = String(r.visits) + (r.visitsOverridden ? " (override)" : "");
+    $("rSeasonMonths").textContent  = r.months + (r.months === 1 ? " month" : " months");
+    $("rCoreSeason").textContent    = money(r.coreSeason);
+    $("rAddonsTotal").textContent   = money(r.addonsTotal);
+    $("rSeasonTotal").textContent   = money(r.seasonTotal);
+    $("rBilling").textContent       = billingText(inp, r);
+    $("rCostPerVisit").textContent  = money(r.costPerVisit);
+    $("rProfitPerVisit").textContent = money(r.profitPerVisit);
+    $("rMargin").textContent        = isNaN(r.marginPct) ? "—" : r.marginPct.toFixed(1) + "%";
+    $("rAddonsCost").textContent    = money(r.addonsCostTotal);
+    $("rContractRevenue").textContent = money(r.contractRevenue);
+    $("rContractCost").textContent  = money(r.contractCost);
+    $("rContractProfit").textContent = money(r.contractProfit);
+    $("rContractMargin").textContent = isNaN(r.contractMarginPct) ? "—" : r.contractMarginPct.toFixed(1) + "%";
+    $("visitsAutoNote").textContent = r.visitsOverridden
+      ? "Calendar count from your dates: " + r.autoVisits + " visits — your override (" + r.visits + ") is being used instead."
+      : "Calendar count from your dates: " + r.autoVisits + " visits. Set an override only if you plan extra or fewer visits (weather make-ups, mid-season start).";
+    $("marginWarning").style.display = (!isNaN(r.marginPct) && r.marginPct < 10 && r.perVisit > 0) ? "block" : "none";
+    renderPreview(inp, r);
+    saveSettings();
+    return {inp: inp, r: r};
+  }
+
+  function renderPreview(inp, r){
+    var today = new Date().toLocaleDateString("en-US",{year:"numeric", month:"long", day:"numeric"});
+    $("pvCompany").textContent = inp.companyName || "Your Lawn Care Company";
+    var contact = [inp.companyPhone, inp.companyEmail].filter(function(s){ return !!s; }).join(" · ");
+    $("pvContact").textContent = contact;
+    $("pvClient").textContent  = inp.clientName || "Your Client";
+    $("pvDate").textContent    = today;
+    $("pvAddress").textContent = inp.serviceAddress || "—";
+    $("pvLot").textContent     = inp.lotSqft
+      ? inp.lotSqft.toLocaleString("en-US") + " sq ft (" + (TIERS[inp.lotTier] ? TIERS[inp.lotTier].label.split(" — ")[0] : inp.lotTier) + " tier)"
+      : "—";
+    $("pvFreq").textContent    = freqLabel(inp.frequency);
+    $("pvSeason").textContent  = seasonLabel(inp, r) + " · " + r.visits + " visits per season";
+    var ul = $("pvServices");
+    ul.innerHTML = "";
+    serviceLines(inp, r).forEach(function(txt){
+      var li = document.createElement("li");
+      li.textContent = txt;
+      ul.appendChild(li);
+    });
+    $("pvSeasonTotal").textContent = money(r.seasonTotal);
+    $("pvPerVisit").textContent    = money(r.perVisit);
+    $("pvBilling").textContent     = billingText(inp, r);
+    var terms = [];
+    if(inp.scopeIncluded){ terms.push("Included: " + inp.scopeIncluded); }
+    if(inp.scopeExcluded){ terms.push("Not included: " + inp.scopeExcluded); }
+    if(inp.weatherTerms){ terms.push(inp.weatherTerms); }
+    if(inp.payTerms){ terms.push(inp.payTerms); }
+    var days = inp.cancelDays > 0 ? Math.round(inp.cancelDays) : 14;
+    terms.push("Either party may end this agreement with at least " + days + " days' written notice.");
+    $("pvTerms").textContent = terms.join(" ");
+  }
+
+  // ---- Tier follow: lot size picks the tier; the base price follows only
+  // while it still equals the previous tier's default, so a hand-set price
+  // is never overwritten by typing a new lot size.
+  var lastTier = "medium";
+  function onLotSqft(){
+    var sqft = num("lotSqft");
+    var tier = tierForSqft(sqft);
+    if(tier !== lastTier){
+      if(num("basePrice") === TIERS[lastTier].price){
+        $("basePrice").value = TIERS[tier].price;
+      }
+      $("lotTier").value = tier;
+      lastTier = tier;
+    }
+    render();
+  }
+  function onTierChange(){
+    var tier = $("lotTier").value;
+    $("basePrice").value = TIERS[tier].price;
+    lastTier = tier;
+    render();
+  }
+
+  TEXT_FIELDS.forEach(function(id){ $(id).addEventListener("input", render); });
+  NUM_FIELDS.forEach(function(id){
+    if(id === "lotSqft"){ return; }
+    $(id).addEventListener("input", render);
+  });
+  CHECKS.forEach(function(id){ $(id).addEventListener("change", render); });
+  $("frequency").addEventListener("change", render);
+  $("billingMode").addEventListener("change", render);
+  $("seasonStartDate").addEventListener("change", render);
+  $("seasonEndDate").addEventListener("change", render);
+  $("lotSqft").addEventListener("input", onLotSqft);
+  $("lotTier").addEventListener("change", onTierChange);
+
+  // ---- Settings: company fields + logo (persisted) ----
+  var logoDataUrl = "";
+  var logoImg = (typeof Image !== "undefined") ? new Image() : null;
+
+  function loadSettings(){
+    try {
+      var raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+  function saveSettings(){
+    var s = loadSettings();
+    s.companyName  = $("companyName").value;
+    s.companyPhone = $("companyPhone").value;
+    s.companyEmail = $("companyEmail").value;
+    s.logo = logoDataUrl || "";
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); } catch(e){ /* storage full/blocked */ }
+  }
+  function applySettings(){
+    var s = loadSettings();
+    if(s.companyName){ $("companyName").value = s.companyName; }
+    if(s.companyPhone){ $("companyPhone").value = s.companyPhone; }
+    if(s.companyEmail){ $("companyEmail").value = s.companyEmail; }
+    if(s.logo){ setLogo(s.logo, true); }
+  }
+  function setLogo(dataUrl, silent){
+    logoDataUrl = dataUrl || "";
+    if(logoImg && logoDataUrl){ logoImg.src = logoDataUrl; }
+    $("logoStatus").textContent = logoDataUrl ? "Logo uploaded — it will appear on your PDF agreements." : "No logo uploaded.";
+    $("removeLogoBtn").style.display = logoDataUrl ? "inline-block" : "none";
+    if(!silent){ saveSettings(); }
+  }
+  $("logoInput").addEventListener("change", function(){
+    var f = $("logoInput").files && $("logoInput").files[0];
+    if(!f){ return; }
+    var reader = new FileReader();
+    reader.onload = function(){ setLogo(String(reader.result || "")); render(); };
+    reader.onerror = function(){ alert("That logo file couldn't be read. Try a PNG or JPG."); };
+    reader.readAsDataURL(f);
+  });
+  $("removeLogoBtn").addEventListener("click", function(){
+    $("logoInput").value = "";
+    setLogo("");
+    render();
+  });
+
+  // ---- Pro state + first-free-PDF ----
+  function isPro(){
+    try { return localStorage.getItem(PRO_KEY) === "1"; } catch(e){ return false; }
+  }
+  function freePdfUsed(){
+    try { return parseInt(localStorage.getItem(FREEPDF_KEY) || "0", 10) || 0; } catch(e){ return 0; }
+  }
+  function setFreePdfUsed(n){
+    try { localStorage.setItem(FREEPDF_KEY, String(n)); } catch(e){ /* ignore */ }
+  }
+  function renderPdfNote(){
+    if(isPro()){
+      $("pdfNote").textContent = "Your clean, branded agreement — logo, services, schedule, terms, and signature blocks for both parties. Services and prices only: your crew costs and margin never appear on it.";
+    } else if(freePdfUsed() >= 1){
+      $("pdfNote").textContent = "You've used your one free PDF agreement. Pro unlocks unlimited clean PDFs — plus saved agreements and the client dashboard.";
+    } else {
+      $("pdfNote").textContent = "Your first clean PDF agreement is free — no watermark, your logo, ready to sign. After that, PDFs are a Pro feature.";
+    }
+  }
+  function renderPro(){
+    var pro = isPro();
+    $("proGate").style.display = pro ? "none" : "block";
+    $("proArea").style.display = pro ? "block" : "none";
+    renderPdfNote();
+    if(pro){ renderSaved(); }
+  }
+  $("unlockBtn").addEventListener("click", function(){
+    try { localStorage.setItem(PRO_KEY, "1"); } catch(e){ /* ignore */ }
+    renderPro();
+  });
+  $("lockBtn").addEventListener("click", function(){
+    try { localStorage.removeItem(PRO_KEY); } catch(e){ /* ignore */ }
+    renderPro();
+  });
+
+  // ---- Saved agreements / client dashboard ----
+  function loadAgreements(){
+    try {
+      var raw = localStorage.getItem(AGREEMENTS_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e){ return []; }
+  }
+  function storeAgreements(list){
+    try { localStorage.setItem(AGREEMENTS_KEY, JSON.stringify(list)); }
+    catch(e){ alert("Could not save — this browser's storage is unavailable or full."); }
+  }
+  function agreementTotals(a){
+    var r = calculate(a.inputs);
+    // Monthly recurring follows the agreement's own billing mode: annual
+    // flat-rate agreements pay their installment every month of the year;
+    // per-visit and seasonal agreements count their in-season monthly
+    // equivalent (season total ÷ season months).
+    var monthly = a.inputs.billingMode === "annual" ? r.billing.amount : r.monthlyEquiv;
+    return {monthly: monthly, season: r.seasonTotal};
+  }
+
+  // ---- Renewal center ----
+  // Renewing copies a saved agreement, shifts its season dates one year
+  // forward, and adjusts every client-facing service price by the chosen
+  // percentage. The original agreement is never touched (snapshots are
+  // preserved); the renewal starts life as a fresh Draft.
+  function renderRenewals(list){
+    var box = $("renewalList");
+    if(!box){ return; }
+    box.innerHTML = "";
+    if(!list.length){
+      var p = document.createElement("p");
+      p.className = "empty-note";
+      p.textContent = "No saved agreements yet — renewals will appear here.";
+      box.appendChild(p);
+      return;
+    }
+    list.forEach(function(ag){
+      var row = document.createElement("div");
+      row.className = "saved-item";
+
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = ag.name;
+      row.appendChild(name);
+
+      var r = calculate(ag.inputs);
+      var season = document.createElement("span");
+      season.className = "date";
+      season.textContent = seasonLabel(ag.inputs, r);
+      row.appendChild(season);
+
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn btn-ghost btn-small";
+      btn.textContent = "Renew for next season";
+      btn.addEventListener("click", function(){ renewAgreement(ag.id); });
+      row.appendChild(btn);
+
+      box.appendChild(row);
+    });
+  }
+
+  function renewAgreement(id){
+    var pct = parseFloat($("renewAdjustPct").value);
+    if(isNaN(pct)){ pct = 0; }
+    var factor = 1 + pct / 100;
+    function adj(v){
+      return Math.round((Number(v) || 0) * factor * 100) / 100;
+    }
+    var all = loadAgreements();
+    var src = null;
+    all.forEach(function(b){ if(b.id === id){ src = b; } });
+    if(!src){ return; }
+    var copy = JSON.parse(JSON.stringify(src));
+    var inp = copy.inputs;
+    var dates = seasonDates(inp);
+    inp.seasonStartDate = dateStr(shiftYearParts(dates.start));
+    inp.seasonEndDate = dateStr(shiftYearParts(dates.end));
+    delete inp.seasonStart;
+    delete inp.seasonEnd;
+    inp.basePrice = adj(inp.basePrice);
+    ["sur_gate_amt","sur_slope_amt","sur_obstacles_amt",
+     "surcharge_sur_gate","surcharge_sur_slope","surcharge_sur_obstacles"].forEach(function(k){
+      if(inp[k] !== undefined){ inp[k] = adj(inp[k]); }
+    });
+    ADDONS.forEach(function(a){
+      if(inp["price_" + a.key] !== undefined){ inp["price_" + a.key] = adj(inp["price_" + a.key]); }
+    });
+    copy.id = Date.now() + "";
+    copy.name = src.name + " (renewed)";
+    copy.status = "Draft";
+    copy.savedAt = new Date().toISOString();
+    copy.inputs = inp;
+    all.unshift(copy);
+    storeAgreements(all);
+    renderSaved();
+  }
+
+  function renderSaved(){
+    var list = loadAgreements();
+    var box = $("savedList");
+    box.innerHTML = "";
+
+    var active = 0, monthly = 0, seasonRev = 0;
+    list.forEach(function(a){
+      if(a.status === "Active"){
+        var t = agreementTotals(a);
+        active += 1;
+        monthly += t.monthly;
+        seasonRev += t.season;
+      }
+    });
+    $("totActive").textContent = String(active);
+    $("totMonthly").textContent = usd(monthly) + "/mo";
+    $("totSeasonRev").textContent = usd(seasonRev);
+
+    renderRenewals(list);
+
+    if(!list.length){
+      var p = document.createElement("p");
+      p.className = "empty-note";
+      p.textContent = "No saved agreements yet. Price a lawn above and save it here.";
+      box.appendChild(p);
+      return;
+    }
+    list.forEach(function(ag){
+      var row = document.createElement("div");
+      row.className = "saved-item";
+
+      var status = ag.status || "Draft";
+      var chip = document.createElement("span");
+      chip.className = "status st-" + status.replace(" ", "-");
+      chip.textContent = status;
+      row.appendChild(chip);
+
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = ag.name;
+      row.appendChild(name);
+
+      var t = agreementTotals(ag);
+      var amtEl = document.createElement("span");
+      amtEl.className = "amt";
+      amtEl.textContent = usd(t.monthly) + "/mo";
+      row.appendChild(amtEl);
+
+      var date = document.createElement("span");
+      date.className = "date";
+      date.textContent = ag.savedAt ? new Date(ag.savedAt).toLocaleDateString("en-US") : "";
+      row.appendChild(date);
+
+      var sel = document.createElement("select");
+      sel.setAttribute("aria-label", "Agreement status");
+      STATUSES.forEach(function(st){
+        var opt = document.createElement("option");
+        opt.value = st; opt.textContent = st;
+        if(st === status){ opt.selected = true; }
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", function(){
+        var all = loadAgreements();
+        all.forEach(function(b){ if(b.id === ag.id){ b.status = sel.value; } });
+        storeAgreements(all);
+        renderSaved();
+      });
+      row.appendChild(sel);
+
+      var loadBtn = document.createElement("button");
+      loadBtn.type = "button";
+      loadBtn.className = "btn btn-ghost btn-small";
+      loadBtn.textContent = "Load";
+      loadBtn.addEventListener("click", function(){
+        applyInputs(ag.inputs);
+        render();
+      });
+      row.appendChild(loadBtn);
+
+      var dupBtn = document.createElement("button");
+      dupBtn.type = "button";
+      dupBtn.className = "btn btn-ghost btn-small";
+      dupBtn.textContent = "Duplicate";
+      dupBtn.addEventListener("click", function(){
+        var all = loadAgreements();
+        var copy = JSON.parse(JSON.stringify(ag));
+        copy.id = Date.now() + "";
+        copy.name = ag.name + " (copy)";
+        copy.status = "Draft";
+        copy.savedAt = new Date().toISOString();
+        all.unshift(copy);
+        storeAgreements(all);
+        renderSaved();
+      });
+      row.appendChild(dupBtn);
+
+      var delBtn = document.createElement("button");
+      delBtn.type = "button";
+      delBtn.className = "btn btn-ghost btn-small";
+      delBtn.textContent = "Delete";
+      delBtn.addEventListener("click", function(){
+        storeAgreements(loadAgreements().filter(function(b){ return b.id !== ag.id; }));
+        renderSaved();
+      });
+      row.appendChild(delBtn);
+
+      box.appendChild(row);
+    });
+  }
+
+  $("saveBtn").addEventListener("click", function(){
+    if(!isPro()){ alert("Saving agreements is a Pro feature. Subscribe or unlock Pro below."); return; }
+    var name = $("agreementName").value.trim();
+    if(!name){
+      var cl = $("clientName").value.trim() || $("serviceAddress").value.trim();
+      name = cl ? cl + " agreement" : "Untitled agreement";
+    }
+    var list = loadAgreements();
+    list.unshift({ id: Date.now() + "", name: name, status: "Draft",
+                   savedAt: new Date().toISOString(), inputs: readInputs() });
+    storeAgreements(list);
+    $("agreementName").value = "";
+    renderSaved();
+  });
+
+  // ---- Downloads: backup JSON / CSV ----
+  function download(filename, content, type){
+    var blob = new Blob([content], {type: type});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 500);
+  }
+
+  $("exportBackupBtn").addEventListener("click", function(){
+    var payload = {
+      app: "YardContract", version: 1,
+      exportedAt: new Date().toISOString(),
+      pro: isPro(),
+      settings: loadSettings(),
+      agreements: loadAgreements()
+    };
+    download("yardcontract-backup-" + new Date().toISOString().slice(0,10) + ".json",
+             JSON.stringify(payload, null, 2), "application/json");
+  });
+
+  function csvCell(v){
+    var s = (v === undefined || v === null) ? "" : String(v);
+    return '"' + s.replace(/"/g, '""') + '"';
+  }
+  $("exportCsvBtn").addEventListener("click", function(){
+    var list = loadAgreements();
+    var lines = [["Agreement name","Status","Client","Service address","Frequency","Season","Per-visit price","Visits per season","Monthly equivalent","Billing schedule","Season total","Saved date"].join(",")];
+    list.forEach(function(a){
+      var r = calculate(a.inputs);
+      lines.push([
+        csvCell(a.name), csvCell(a.status || "Draft"),
+        csvCell(a.inputs.clientName || ""), csvCell(a.inputs.serviceAddress || ""),
+        csvCell(freqLabel(a.inputs.frequency)),
+        csvCell(seasonLabel(a.inputs, r)),
+        csvCell(r.perVisit.toFixed(2)),
+        csvCell(String(r.visits)),
+        csvCell(r.monthlyEquiv.toFixed(2)),
+        csvCell(billingText(a.inputs, r)),
+        csvCell(r.seasonTotal.toFixed(2)),
+        csvCell(a.savedAt ? new Date(a.savedAt).toLocaleDateString("en-US") : "")
+      ].join(","));
+    });
+    download("yardcontract-agreements-" + new Date().toISOString().slice(0,10) + ".csv",
+             lines.join("\n"), "text/csv");
+  });
+
+  $("importInput").addEventListener("change", function(){
+    var f = $("importInput").files && $("importInput").files[0];
+    if(!f){ return; }
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var data = JSON.parse(String(reader.result || ""));
+        if(!data || data.app !== "YardContract" || !Array.isArray(data.agreements)){ throw new Error("bad file"); }
+        storeAgreements(data.agreements);
+        if(data.settings){
+          try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(data.settings)); } catch(e){ /* ignore */ }
+          logoDataUrl = "";
+          applySettings();
+        }
+        if(data.pro){ try { localStorage.setItem(PRO_KEY, "1"); } catch(e){ /* ignore */ } }
+        renderPro();
+        render();
+        alert("Backup restored: " + data.agreements.length + " agreement(s) imported.");
+      } catch(e){
+        alert("That file doesn't look like a YardContract backup. Nothing was changed.");
+      }
+      $("importInput").value = "";
+    };
+    reader.onerror = function(){ alert("That file couldn't be read. Nothing was changed."); };
+    reader.readAsText(f);
+  });
+
+  // ---- Professional PDF agreement (Pro, or the one free PDF) ----
+  // IMPORTANT: the client PDF shows services, schedule, and prices ONLY —
+  // never crew costs, hourly rates, profit, or margin.
+  $("pdfBtn").addEventListener("click", function(){
+    var pro = isPro();
+    if(!pro && freePdfUsed() >= 1){
+      alert("You've used your one free PDF agreement. Subscribe ($19/month founding price) or tap \u201CI already subscribed \u2014 unlock Pro\u201D below for unlimited PDFs.");
+      return;
+    }
+    if(!window.jspdf || !window.jspdf.jsPDF){
+      alert("The PDF library couldn't load. Check your internet connection and try again — everything else on this page works offline. (Your free PDF has not been used.)");
+      return;
+    }
+    var out = render();
+    var inp = out.inp, r = out.r;
+    if(!(r.perVisit > 0)){
+      alert("Set a mowing price first, then download the PDF.");
+      return;
+    }
+
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({unit:"pt", format:"letter"});
+    var pageW = doc.internal.pageSize.getWidth();
+    var pageH = doc.internal.pageSize.getHeight();
+    var marginX = 56;
+    var y = 60;
+    var maxW = pageW - marginX * 2;
+
+    function ensureSpace(needed){
+      if(y + needed > pageH - 56){
+        doc.addPage();
+        y = 60;
+      }
+    }
+    function para(text, size, style, gap){
+      doc.setFont("helvetica", style || "normal");
+      doc.setFontSize(size || 11.5);
+      doc.splitTextToSize(text, maxW).forEach(function(line){
+        ensureSpace(16);
+        doc.text(line, marginX, y); y += 15;
+      });
+      y += (gap === undefined ? 6 : gap);
+    }
+
+    var company = inp.companyName || "Your Lawn Care Company";
+    var today = new Date().toLocaleDateString("en-US",{year:"numeric", month:"long", day:"numeric"});
+
+    // Header: logo (if any), company name, contact line
+    if(logoDataUrl && logoImg && logoImg.complete && logoImg.naturalWidth > 0){
+      var lw = 150, lh = 42;
+      var w = logoImg.naturalWidth, h = logoImg.naturalHeight;
+      var scale = Math.min(lw / w, lh / h);
+      var fmt = logoDataUrl.indexOf("data:image/png") === 0 ? "PNG" : "JPEG";
+      try {
+        doc.addImage(logoDataUrl, fmt, marginX, y - 8, Math.round(w * scale), Math.round(h * scale));
+        y += Math.round(h * scale) + 14;
+      } catch(e){ /* bad image data — skip logo */ }
+    }
+    doc.setFont("helvetica","bold"); doc.setFontSize(20); doc.setTextColor(30,43,26);
+    doc.text(company, marginX, y); y += 16;
+    var contact = [inp.companyPhone, inp.companyEmail].filter(function(s){ return !!s; }).join("  ·  ");
+    if(contact){
+      doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(92,107,87);
+      doc.text(contact, marginX, y); y += 8;
+    }
+    doc.setDrawColor(62,125,50); doc.setLineWidth(2.5);
+    doc.line(marginX, y, pageW - marginX, y); y += 30;
+
+    doc.setTextColor(30,43,26); doc.setFontSize(15);
+    doc.text("Lawn Care Service Agreement", marginX, y); y += 20;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11); doc.setTextColor(92,107,87);
+    if(inp.clientName){ doc.text("Prepared for: " + inp.clientName, marginX, y); y += 16; }
+    if(inp.serviceAddress){ doc.text("Service address: " + inp.serviceAddress, marginX, y); y += 16; }
+    doc.text("Date: " + today, marginX, y); y += 26;
+
+    // Property & schedule (no internal numbers)
+    doc.setTextColor(30,43,26); doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Property & schedule", marginX, y); y += 18;
+    doc.setFontSize(11.5);
+    var details = [
+      ["Lot size", inp.lotSqft.toLocaleString("en-US") + " sq ft (" +
+        (TIERS[inp.lotTier] ? TIERS[inp.lotTier].label.split(" — ")[0] : inp.lotTier) + " tier)"],
+      ["Frequency", freqLabel(inp.frequency)],
+      ["Season", seasonLabel(inp, r)],
+      ["Visits per season", String(r.visits)]
+    ];
+    details.forEach(function(pair){
+      ensureSpace(18);
+      doc.setFont("helvetica","bold");   doc.text(pair[0] + ":", marginX, y);
+      doc.setFont("helvetica","normal"); doc.text(pair[1], marginX + 140, y);
+      y += 18;
+    });
+    y += 12;
+
+    // Services & pricing
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Services & pricing", marginX, y); y += 18;
+    doc.setFont("helvetica","normal"); doc.setFontSize(11.5);
+    serviceLines(inp, r).forEach(function(txt){
+      doc.splitTextToSize("\u2022  " + txt, maxW).forEach(function(line){
+        ensureSpace(17);
+        doc.text(line, marginX + 6, y); y += 17;
+      });
+    });
+    y += 6;
+    doc.setFontSize(12.5);
+    ensureSpace(20);
+    doc.setFont("helvetica","bold");
+    doc.text("Season total:", marginX, y);
+    doc.setTextColor(44,92,35);
+    doc.text(usd(r.seasonTotal), marginX + 165, y);
+    doc.setTextColor(30,43,26); y += 20;
+    doc.setFontSize(11.5); doc.setFont("helvetica","normal");
+    ensureSpace(18);
+    doc.text("Per-visit price: " + usd(r.perVisit), marginX, y); y += 22;
+    para("Billing: " + billingText(inp, r), 11.5, "normal", 16);
+
+    // Terms
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Terms", marginX, y); y += 18;
+    doc.setTextColor(30,43,26);
+    if(inp.scopeIncluded){ para("Included: " + inp.scopeIncluded); }
+    if(inp.scopeExcluded){ para("Not included: " + inp.scopeExcluded); }
+    if(inp.weatherTerms){ para(inp.weatherTerms); }
+    if(inp.payTerms){ para(inp.payTerms); }
+    var days = inp.cancelDays > 0 ? Math.round(inp.cancelDays) : 14;
+    para("Either party may end this agreement with at least " + days + " days' written notice.");
+
+    // Signatures — both parties
+    ensureSpace(120);
+    doc.setFont("helvetica","bold"); doc.setFontSize(12);
+    doc.text("Signatures", marginX, y); y += 26;
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5); doc.setTextColor(92,107,87);
+    var colW = (pageW - marginX * 2 - 30) / 2;
+    var partyLabel = [company, inp.clientName || "Client"];
+    partyLabel.forEach(function(label, i){
+      var x = marginX + i * (colW + 30);
+      doc.setFont("helvetica","bold"); doc.setTextColor(30,43,26); doc.setFontSize(11.5);
+      doc.text(label, x, y);
+      var ly = y + 22;
+      doc.setDrawColor(30,43,26); doc.setLineWidth(0.8);
+      doc.line(x, ly, x + colW, ly);
+      doc.setFont("helvetica","normal"); doc.setFontSize(10); doc.setTextColor(92,107,87);
+      doc.text("Printed name", x, ly + 13);
+      ly += 34;
+      doc.line(x, ly, x + colW, ly);
+      doc.text("Signature", x, ly + 13);
+      ly += 34;
+      doc.line(x, ly, x + colW, ly);
+      doc.text("Date", x, ly + 13);
+    });
+    y += 22 + 34 + 34 + 20;
+
+    // Footer: template disclaimer, discreet
+    ensureSpace(40);
+    doc.setFont("helvetica","italic"); doc.setFontSize(8.5); doc.setTextColor(120,128,115);
+    doc.splitTextToSize(LEGAL_FOOTER, maxW).forEach(function(line){
+      doc.text(line, marginX, y); y += 11;
+    });
+
+    var fname = "yardcontract-agreement-" + new Date().toISOString().slice(0,10) + ".pdf";
+    doc.save(fname);
+    if(!pro){
+      setFreePdfUsed(freePdfUsed() + 1);
+      renderPdfNote();
+    }
+  });
+
+  // ---- Init ----
+  $("subscribeBtn").href = STRIPE_LINK;
+  $("subscribeAnnualBtn").href = STRIPE_LINK_ANNUAL;
+  applySettings();
+  lastTier = $("lotTier").value;
+  renderPro();
+  render();
+
+  // Test/automation hook (harmless in production): exposes the pure math and
+  // state readers so the agreement engine can be verified headlessly.
+  window.YardContract = {
+    calculate: calculate,
+    tierForSqft: tierForSqft,
+    seasonDates: seasonDates,
+    monthsSpanned: monthsSpanned,
+    countVisits: countVisits,
+    billingFor: billingFor,
+    billingText: billingText,
+    parseDateStr: parseDateStr,
+    loadAgreements: loadAgreements,
+    isPro: isPro,
+    freePdfUsed: freePdfUsed,
+    TIERS: TIERS,
+    ADDONS: ADDONS,
+    LEGAL_FOOTER: LEGAL_FOOTER,
+    STRIPE_LINK: STRIPE_LINK,
+    STRIPE_LINK_ANNUAL: STRIPE_LINK_ANNUAL
+  };
+})();
+</script>
+</body>
+</html>
