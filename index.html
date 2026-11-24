@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YardContract — Price smarter. Lock in recurring lawn care revenue.</title>
+<meta name="description" content="YardContract is a recurring lawn-care service agreement builder for independent lawn care businesses. Price by lot size, count visits on the real calendar, choose per-visit or flat-rate billing, see your true contract profit, and send a professional agreement with both signatures.">
+<style>
+  :root{
+    --ink:#1e2b1a; --muted:#5c6b57; --brand:#3e7d32; --brand-dark:#2c5c23;
+    --bg:#f6f8f3; --card:#ffffff; --line:#dce4d5; --accent:#e9f3e2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg); color:var(--ink); line-height:1.55;}
+  .wrap{max-width:960px; margin:0 auto; padding:0 20px;}
+  header{background:var(--ink); color:#fff;}
+  header .wrap{display:flex; align-items:center; justify-content:space-between; padding:16px 20px;}
+  .logo{font-size:22px; font-weight:800; letter-spacing:.2px;}
+  .logo span{color:#8fd07a;}
+  header a{color:#fff; text-decoration:none; font-weight:600; font-size:15px;}
+  header a:hover{text-decoration:underline;}
+  .hero{padding:64px 0 48px; text-align:center;}
+  .hero h1{font-size:40px; line-height:1.15; max-width:720px; margin:0 auto 16px;}
+  .hero p{font-size:19px; color:var(--muted); max-width:640px; margin:0 auto 30px;}
+  .cta-row{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .btn{display:inline-block; padding:14px 28px; border-radius:8px; font-size:17px; font-weight:700;
+       text-decoration:none; border:2px solid transparent; cursor:pointer;}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-outline{background:#fff; color:var(--brand-dark); border-color:var(--brand);}
+  .btn-outline:hover{background:var(--accent);}
+  .price-note{margin-top:14px; color:var(--muted); font-size:15px;}
+  section{padding:44px 0;}
+  h2{font-size:27px; text-align:center; margin-bottom:30px;}
+  .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
+  .step{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:24px;}
+  .step .num{width:36px; height:36px; border-radius:50%; background:var(--brand); color:#fff;
+             font-weight:800; display:flex; align-items:center; justify-content:center; margin-bottom:12px;}
+  .step h3{font-size:18px; margin-bottom:8px;}
+  .step p{color:var(--muted); font-size:15px;}
+  .features{display:grid; grid-template-columns:repeat(2,1fr); gap:18px;}
+  .feature{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .feature h3{font-size:17px; margin-bottom:6px;}
+  .feature p{color:var(--muted); font-size:15px;}
+  .feature .tag{display:inline-block; font-size:11.5px; font-weight:800; letter-spacing:.4px;
+                padding:2px 8px; border-radius:20px; margin-bottom:8px;}
+  .tag-free{background:var(--accent); color:var(--brand-dark);}
+  .tag-pro{background:var(--ink); color:#fff;}
+  .pricing{background:var(--card); border:1px solid var(--line); border-radius:12px;
+           max-width:540px; margin:0 auto; padding:34px; text-align:center;}
+  .pricing .badge{display:inline-block; background:#fdf0e6; color:#8a4b12;
+                  font-weight:800; font-size:13px; padding:4px 12px; border-radius:20px; margin-bottom:14px;}
+  .pricing .amount{font-size:46px; font-weight:800;}
+  .pricing .per{color:var(--muted); font-size:17px;}
+  .pricing .founding{margin-top:12px; font-size:15px; color:var(--ink);}
+  .pricing .standard{color:var(--muted); font-size:14px;}
+  .pricing ul{list-style:none; margin:20px 0 26px; text-align:left;}
+  .pricing li{padding:7px 0 7px 26px; position:relative; color:var(--ink); font-size:15.5px;}
+  .pricing li::before{content:"✓"; position:absolute; left:0; color:var(--brand); font-weight:800;}
+  .honest{background:var(--accent); border-radius:10px; padding:20px 24px; max-width:720px; margin:0 auto;
+          color:var(--brand-dark); font-size:15.5px; text-align:center;}
+  /* Sample agreement */
+  .sample-cap{text-align:center; color:var(--muted); font-size:14.5px; margin-top:14px;}
+  .sample-doc{background:#fff; border:1px solid var(--line); border-radius:6px; max-width:680px;
+              margin:0 auto; padding:38px 42px; box-shadow:0 4px 18px rgba(30,43,26,.07); text-align:left;}
+  .sample-doc .co{font-size:21px; font-weight:800; color:var(--ink);}
+  .sample-doc .contact{color:var(--muted); font-size:13.5px; margin-bottom:4px;}
+  .sample-doc .rule{height:3px; background:var(--brand); border-radius:2px; margin:10px 0 20px;}
+  .sample-doc h3{font-size:17px; margin-bottom:4px;}
+  .sample-doc .date{color:var(--muted); font-size:13.5px; margin-bottom:18px;}
+  .sample-doc h4{font-size:14.5px; margin:18px 0 8px;}
+  .sample-doc p, .sample-doc li{font-size:14.5px;}
+  .sample-doc ul{margin:0 0 6px 20px;}
+  .sample-doc .kv{display:flex; gap:10px; font-size:14.5px; padding:3px 0;}
+  .sample-doc .kv b{min-width:170px;}
+  .sample-doc .invest{font-size:16px; margin-top:6px;}
+  .sample-doc .invest b{color:var(--brand-dark); font-size:19px;}
+  .sample-doc .sig{margin-top:30px; display:grid; grid-template-columns:1fr 1fr; gap:26px;}
+  .sample-doc .sig .line{border-top:1px solid var(--ink); padding-top:5px; font-size:12.5px; color:var(--muted);}
+  .policies{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  .policy{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:22px;}
+  .policy h3{font-size:17px; margin-bottom:8px;}
+  .policy p{color:var(--muted); font-size:15px;}
+  footer{border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted); font-size:14.5px; text-align:center;}
+  footer a{color:var(--brand-dark);}
+  @media (max-width:720px){
+    .steps,.features,.policies{grid-template-columns:1fr;}
+    .hero h1{font-size:31px;}
+    .hero{padding:44px 0 34px;}
+    .sample-doc{padding:26px 22px;}
+    .sample-doc .sig{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="logo">Yard<span>Contract</span></div>
+    <a href="app.html">Open the builder</a>
+  </div>
+</header>
+
+<div class="hero wrap">
+  <h1>Price smarter. Lock in recurring lawn care revenue.</h1>
+  <p>YardContract is a service agreement builder made for independent lawn care operators running
+     roughly 10–50 recurring properties — the ones still pricing from gut feel, handshake deals, and
+     spreadsheets. Price every lawn by its real size, count the season's visits on the real calendar,
+     choose per-visit or flat-rate billing, and see your true profit on the whole contract — then put
+     it all in a written agreement your client signs. No more "can you also trim the hedge?" for free,
+     no more arguments about what was included.</p>
+  <p>YardContract is deliberately <strong>not</strong> a Jobber or LMN replacement: no scheduling, no invoicing, no CRM.
+     Just profitable pricing and professional agreements, without the complicated software.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://buy.stripe.com/3cI7sM2RB9H26eU9K00oM0s">Subscribe — $19/month founding price</a>
+    <a class="btn btn-primary" href="https://buy.stripe.com/cNiaEY1Nx3iE9r67BS0oM0t">Subscribe — $129/year founding annual</a>
+    <a class="btn btn-outline" href="app.html">Try the builder free</a>
+  </div>
+  <p class="price-note">The builder and a watermarked agreement preview are free — and your first clean PDF agreement is free too. Pro unlocks unlimited PDFs, saved agreements, the client dashboard, and the renewal center.</p>
+</div>
+
+<section class="wrap">
+  <h2>How it works</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="num">1</div>
+      <h3>Measure the yard</h3>
+      <p>Enter the lot size and YardContract picks the right price tier. Add flat surcharges for wide gates, slopes, and obstacle-heavy yards — the things that make a "simple" lawn take twice as long.</p>
+    </div>
+    <div class="step">
+      <div class="num">2</div>
+      <h3>Build the season</h3>
+      <p>Pick weekly, every-2-weeks, or monthly visits and set the real season start and end dates — visits are counted on the actual calendar, not a rough month estimate. Add seasonal services like fertilization, aeration, and leaf cleanup, then choose how the client pays: per visit, equal monthly payments during the season, or equal monthly payments all year.</p>
+    </div>
+    <div class="step">
+      <div class="num">3</div>
+      <h3>Sign it, then mow</h3>
+      <p>Download a clean agreement with the scope, schedule, prices, billing plan, weather and cancellation terms, and signature lines for both of you. Your crew costs and margin stay private — the client sees services and prices only. Next season, renew every client in one click with your new prices.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>What you get</h2>
+  <div class="features">
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Full agreement builder</h3>
+      <p>Every input — lot size tiers, surcharges, frequency, real season dates, seasonal services — with visits counted on the actual calendar and live per-visit, billing-plan, and season numbers, plus a plain-words warning if your margin drops under 10%.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Three ways to bill</h3>
+      <p>Per visit, seasonal flat rate (equal payments during the season), or annual flat rate (equal payments all year) — you pick. Flat-rate payments are rounded to the cent and the final payment absorbs the remainder, so installments always add up to the exact season total.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Watermarked agreement preview</h3>
+      <p>See exactly how your agreement will look — your company, the client, the scope, the schedule, and the price — right on screen, free.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-free">FREE</span>
+      <h3>Your first PDF is free</h3>
+      <p>Your first clean, branded PDF agreement — no watermark — is on us. Use it on a real client. After that, PDFs are a Pro feature.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>Professional PDF agreements</h3>
+      <p>Your logo and contact info, services and season schedule, per-visit and season pricing, scope included/excluded, weather-delay, payment, and cancellation terms, and signature blocks for both parties. Your crew costs and margin never appear on the client copy.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>Client dashboard &amp; backups</h3>
+      <p>Save every agreement, mark it Draft, Sent, Active, Paused, or Ended, and watch your active clients, monthly recurring revenue, and season revenue add up. Export a backup file or a CSV anytime — your data stays in your browser, under your control.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>Renewal center</h3>
+      <p>When the new season comes, renew any saved agreement in one click: the season dates roll forward a year, every service price adjusts by your percentage (say +3%), and the renewal starts as a fresh Draft. The original agreement is never changed.</p>
+    </div>
+    <div class="feature">
+      <span class="tag tag-pro">PRO</span>
+      <h3>True contract profit</h3>
+      <p>Crew time, fuel, equipment, overhead, and each seasonal service's own cost — totaled across the whole contract, so you see the real profit and margin on every agreement before you sign it. These numbers never appear on the client's copy.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>See a sample agreement</h2>
+  <div class="sample-doc">
+    <div class="co">GreenEdge Lawn Care</div>
+    <div class="contact">(555) 014-7788 · hello@greenedgelawn.example</div>
+    <div class="rule"></div>
+    <h3>Lawn Care Service Agreement</h3>
+    <div class="date">Prepared for: <strong>Marcus &amp; Elena Ruiz</strong> · Date: November 23, 2026</div>
+
+    <h4>Property &amp; schedule</h4>
+    <div class="kv"><b>Service address</b><span>4218 Willow Creek Dr</span></div>
+    <div class="kv"><b>Lot size</b><span>8,500 sq ft (Medium tier)</span></div>
+    <div class="kv"><b>Frequency</b><span>Every 2 weeks</span></div>
+    <div class="kv"><b>Season</b><span>April 1, 2026 – October 31, 2026 · 16 visits per season</span></div>
+
+    <h4>Services &amp; pricing</h4>
+    <ul>
+      <li>Mowing, trimming, edging &amp; blowing — $70.00 per visit (includes $10.00 slope surcharge)</li>
+      <li>Fertilization — $55.00 per application × 3 = $165.00</li>
+    </ul>
+    <p class="invest">Season total: <b>$1,285.00</b></p>
+    <div class="kv"><b>Per-visit price</b><span>$70.00</span></div>
+    <div class="kv"><b>Billing</b><span>7 monthly payments of $183.57 during the season (final payment $183.58) — $1,285.00 total</span></div>
+
+    <h4>Terms</h4>
+    <p>Weather delays move a visit to the next available day that week at no extra charge. Either party may end this agreement with at least 14 days' written notice. Full terms are set out in the agreement.</p>
+
+    <div class="sig">
+      <div class="line">GreenEdge Lawn Care — signature &amp; date</div>
+      <div class="line">Marcus &amp; Elena Ruiz — signature &amp; date</div>
+    </div>
+  </div>
+  <p class="sample-cap">Sample agreement — GreenEdge Lawn Care and the Ruiz family are fictional. Your agreements carry your logo, your services, and your prices.</p>
+</section>
+
+<section class="wrap">
+  <h2>Simple pricing</h2>
+  <div class="pricing">
+    <div class="badge">FOUNDING MEMBERS — FIRST 25 CUSTOMERS</div>
+    <div class="amount">$19</div>
+    <div class="per">per month — or $129/year</div>
+    <p class="founding"><strong>$19/month founding-member pricing</strong> — locked in while your subscription stays active.</p>
+    <p class="founding"><strong>Founding annual: $129/year</strong> — that's $10.75/month, a $99 saving vs paying monthly. Better for a seasonal business: one payment covers the whole year, renewals included.</p>
+    <p class="standard">Standard price after the founding spots are gone: $29/month or $199/year.</p>
+    <ul>
+      <li>Full builder + watermarked preview — free forever</li>
+      <li>Your first clean PDF agreement — free</li>
+      <li>Clean, branded PDF agreements with your logo</li>
+      <li>Per-visit, seasonal flat-rate, and annual flat-rate billing plans</li>
+      <li>Unlimited saved agreements + client dashboard</li>
+      <li>Renewal center — next season's agreements in one click</li>
+      <li>Backup export / restore + CSV export</li>
+      <li>Works on phone, tablet, and computer</li>
+      <li>Cancel anytime</li>
+    </ul>
+    <a class="btn btn-primary" href="https://buy.stripe.com/3cI7sM2RB9H26eU9K00oM0s">Subscribe — $19/month founding price</a>
+    <a class="btn btn-outline" href="https://buy.stripe.com/cNiaEY1Nx3iE9r67BS0oM0t" style="margin-top:10px;">Subscribe — $129/year founding annual</a>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="honest">
+    <strong>Straight talk:</strong> YardContract is a new tool from a small independent maker.
+    We don't post testimonials or customer counts we don't have. Try the builder free —
+    if the numbers don't help you price better, don't subscribe.<br><br>
+    <strong>Where your records live:</strong> only in your browser, on this device. They do not
+    sync to your phone, your computer, or the cloud — there is no account holding a copy.
+    Export a backup file from the app regularly; that backup is your protection if your
+    browser data is ever cleared.
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>The fine print, in plain words</h2>
+  <div class="policies">
+    <div class="policy">
+      <h3>Privacy</h3>
+      <p>Your agreements, your company info, and your logo are stored only in your own browser on your own
+         device. Nothing you type into the builder is uploaded to us or anyone else — there is no
+         account and no tracking of your numbers. Your records live only in this browser on this
+         device: they do not sync to your phone or another computer, and we hold no copy. Export a
+         backup file from the app regularly — that backup is your protection, because clearing your
+         browser data erases what's saved here.</p>
+    </div>
+    <div class="policy">
+      <h3>Billing &amp; cancellation</h3>
+      <p>Subscriptions are billed through Stripe — monthly on the $19 plan, yearly on the $129 plan.
+         You can cancel anytime from your Stripe receipt or the Stripe customer portal — no email
+         to us required, no cancellation fee. When you cancel, Pro stays active until the end of
+         the period you already paid for, and the free builder keeps working either way.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    YardContract · Questions? Email <a href="mailto:chrisla122787@gmail.com">chrisla122787@gmail.com</a>
+  </div>
+</footer>
+
+</body>
+</html>
